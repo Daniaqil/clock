@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jam Generatif</title>
+    <style>
+        
+        body {
+            margin: 0;
+            background-color: #000;
+            color: white;
+            overflow: hidden;
+            
+            cursor: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+     
+        #digital-clock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 5em;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+            opacity: 0.7;
+            transition: opacity 0.5s ease;
+        }
+
+       
+        body:hover #digital-clock {
+            opacity: 0.7;
+        }
+
+        body:not(:hover) #digital-clock {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="clockCanvas"></canvas>
+    
+    <div id="digital-clock"></div>
+
+    <script>
+        const canvas = document.getElementById('clockCanvas');
+        const ctx = canvas.getContext('2d');
+        const digitalDisplay = document.getElementById('digital-clock');
+
+       r
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        
+        function pad(n) {
+            return n < 10 ? '0' + n : n;
+        }
+
+       
+        function animate() {
+            
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const ms = now.getMilliseconds();
+
+           
+            digitalDisplay.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+
+        
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 3. Logika Visual Jam
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+         
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            
+            const hue = (h / 24) * 360; 
+            
+            const saturation = 50 + (m / 60) * 50; 
+            
+            const lightness = 40 + (s / 60) * 40; 
+
+            
+            const baseRadius = Math.min(canvas.width, canvas.height) * 0.15; 
+
+           
+            const hourProgress = ((h % 12) + m / 60) / 12; 
+            const hourAngle = hourProgress * 2 * Math.PI - (0.5 * Math.PI); 
+            const hourRadius = baseRadius * 1.5;
+            
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = `hsl(${(hue + 240) % 360}, ${saturation}%, 60%)`; 
+            ctx.beginPath();
+            ctx.arc(0, 0, hourRadius, -0.5 * Math.PI, hourAngle); 
+            ctx.stroke();
+
+    
+            const minProgress = (m + s / 60) / 60;
+            const minAngle = minProgress * 2 * Math.PI - (0.5 * Math.PI);
+            const minRadius = baseRadius * 2.5;
+
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = `hsl(${(hue + 120) % 360}, ${saturation}%, 70%)`; 
+            ctx.beginPath();
+            ctx.arc(0, 0, minRadius, -0.5 * Math.PI, minAngle);
+            ctx.stroke();
+
+            
+            const secProgress = (s + ms / 1000) / 60;
+            const secAngle = secProgress * 2 * Math.PI - (0.5 * Math.PI);
+            const secRadius = baseRadius * 3.5;
+            
+            ctx.lineWidth = 4;
+          
+            ctx.strokeStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`; 
+            ctx.beginPath();
+            ctx.arc(0, 0, secRadius, -0.5 * Math.PI, secAngle);
+            ctx.stroke();
+
+
+            ctx.restore(); 
+
+           
+            requestAnimationFrame(animate);
+        }
+
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        
+        animate();
+    </script>
+</body>
+</html>
